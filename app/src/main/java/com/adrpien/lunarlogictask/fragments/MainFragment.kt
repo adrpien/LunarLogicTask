@@ -106,34 +106,34 @@ class MainFragment : Fragment() {
         val listOfSums = mutableListOf<Int>()
 
         for ((index, item) in list.withIndex()){
+            val tempOutputList = list.toMutableList()
             var tempNumberOfSteps = numberOfSteps
             var tempSum = 0
             while (tempNumberOfSteps >= 3) {
-                val tempOutputList = list.toMutableList()
                 var tempDigitList = splitNumberIntoDigits(tempOutputList[index])
                 var x = 0
                 while (x < 3) {
                     tempDigitList = addOne(tempDigitList)
                     x += 1
+                    tempNumberOfSteps -= 1
                 }
                 val tempNumber = mergeDigitsIntoNumber(tempDigitList)
                 tempOutputList[index] = tempNumber
-                tempNumberOfSteps -= 3
-                listOfOutputLists.add(tempOutputList)
-                listOfSums.add(tempOutputList.sum())
             }
+            listOfOutputLists.add(tempOutputList)
+            listOfSums.add(tempOutputList.sum())
         }
         return listOfOutputLists[listOfSums.indexOf(listOfSums.max())]
     }
 
     // Adds one safely (does not add one to digit 9)
     private fun addOne(listOfDigits: MutableList<Int>): MutableList<Int> {
-        val outputList = listOfDigits
+        val outputList = listOfDigits.toMutableList()
         var leftToAdd = 1
         for ((index, item) in outputList.withIndex()) {
             if (leftToAdd > 0 && outputList[index] != 9) {
-                    outputList[index] += 1
-                    leftToAdd -= 1
+                outputList[index] += 1
+                leftToAdd -= 1
             }
         }
         return outputList
@@ -161,9 +161,8 @@ class MainFragment : Fragment() {
 
     // Changes indivisible by three number into number divisible by three
     private fun makeNumberDivisibleByThree(number: Int): Int {
-        val inputNumber: Int = number
         var tempList = splitNumberIntoDigits(number)
-        if(inputNumber % 3 == 2) {
+        if(number % 3 == 2) {
             tempList = addOne(tempList)
             numberOfSteps -= 1
         } else {
