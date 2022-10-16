@@ -81,49 +81,53 @@ class MainFragment : Fragment() {
     */
     private fun useRemainingSteps(list: MutableList<Int>): MutableList<Int> {
 
-        // OLD VERSION
-        /*
-        val outputList = list
-        if(numberOfSteps == 6) {
-            var tempDigitList = splitNumberIntoDigits(outputList.max())
-            tempDigitList[0] += 6
-            val tempNumber = mergeDigitsIntoNumber(tempDigitList)
-            outputList[outputList.indexOf(outputList.max())] = tempNumber
-            numberOfSteps -= 6
-        }
-
-        if(numberOfSteps >= 3){
-            var tempDigitList = splitNumberIntoDigits(outputList.max())
-            tempDigitList[0] += 3
-            val tempNumber = mergeDigitsIntoNumber(tempDigitList)
-            outputList[outputList.indexOf(outputList.max())] = tempNumber
-            numberOfSteps -= 3
-        }
-        */
-
-        // NEW VERSION
         val listOfOutputLists = mutableListOf<MutableList<Int>>()
         val listOfSums = mutableListOf<Int>()
 
-        for ((index, item) in list.withIndex()){
-            val tempOutputList = list.toMutableList()
-            var tempNumberOfSteps = numberOfSteps
-            var tempSum = 0
-            while (tempNumberOfSteps >= 3) {
+        val listOfOutputLists2 = mutableListOf<MutableList<Int>>()
+        val listOfSums2 = mutableListOf<Int>()
+
+        var tempOutputList = list.toMutableList()
+        var tempNumberOfSteps = numberOfSteps
+
+        if (tempNumberOfSteps == 6) {
+            for ((index, item) in tempOutputList.withIndex()) {
+                val tempList = tempOutputList.toMutableList()
                 var tempDigitList = splitNumberIntoDigits(tempOutputList[index])
                 var x = 0
                 while (x < 3) {
                     tempDigitList = addOne(tempDigitList)
                     x += 1
-                    tempNumberOfSteps -= 1
+
                 }
                 val tempNumber = mergeDigitsIntoNumber(tempDigitList)
-                tempOutputList[index] = tempNumber
+                tempList[index] = tempNumber
+                listOfOutputLists2.add(tempList)
+                listOfSums2.add(tempList.sum())
             }
-            listOfOutputLists.add(tempOutputList)
-            listOfSums.add(tempOutputList.sum())
+            tempOutputList = listOfOutputLists2[listOfSums2.indexOf(listOfSums2.max())]
+            tempNumberOfSteps -= 3
+
         }
-        return listOfOutputLists[listOfSums.indexOf(listOfSums.max())]
+        if (tempNumberOfSteps >= 3) {
+            for ((index, item) in tempOutputList.withIndex()){
+                val tempList = tempOutputList.toMutableList()
+                var tempDigitList = splitNumberIntoDigits(tempOutputList[index])
+                var x = 0
+                while (x < 3) {
+                    tempDigitList = addOne(tempDigitList)
+                    x += 1
+                }
+                val tempNumber = mergeDigitsIntoNumber(tempDigitList)
+                tempList[index] = tempNumber
+                listOfOutputLists.add(tempList)
+                listOfSums.add(tempList.sum())
+            }
+            tempNumberOfSteps -= 3
+            tempOutputList = listOfOutputLists[listOfSums.indexOf(listOfSums.max())]
+
+        }
+        return tempOutputList
     }
 
     // Adds one safely (does not add one to digit 9)
