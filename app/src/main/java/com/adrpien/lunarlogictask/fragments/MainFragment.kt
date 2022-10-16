@@ -18,14 +18,15 @@ class MainFragment : Fragment() {
     private lateinit var outputList: MutableList<Int>
     private var numberOfSteps = 6
 
+    /*
+       ************** Lifecycle functions **************
+     */
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentMainBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -35,22 +36,11 @@ class MainFragment : Fragment() {
 
         // actionButton onClick implementation
         binding.actionButton.setOnClickListener {
-
             if(binding.firstValueEditText.text.toString() != "" && binding.secondValueEditText.text.toString() != "" && binding.thirdValueEditText.text.toString() != "") {
-
-                // Capture input values
-                inputList = mutableListOf(
-                    binding.firstValueEditText.text.toString().toInt(),
-                    binding.secondValueEditText.text.toString().toInt(),
-                    binding.thirdValueEditText.text.toString().toInt(),
-                )
-
-                // Get result
+                numberOfSteps = 6
+                inputList = getInputList()
                 outputList = getResult(inputList)
-
-                // Show result implementation
-                binding.resultTextView.text =
-                    "Results: \nvalue1 = ${outputList[0]}, \nvelue2 = ${outputList[1]}, \nvalue3 = ${outputList[2]}"
+                showResult()
             } else {
                 Toast.makeText(context, "Fill empty fields!", Toast.LENGTH_SHORT).show()
             }
@@ -58,38 +48,39 @@ class MainFragment : Fragment() {
 
     }
 
-    private fun getResult(list: MutableList<Int>): MutableList<Int> {
-        numberOfSteps = 6
-        outputList = mutableListOf<Int>()
-        list.forEach {  item ->
-            if(!isDivisibleByThree(item)){
-                outputList.add(makeDivisibleByThree(item))
-            } else {
-                outputList.add(item)
-            }
-        }
-
-        // Use remaining steps if numberOfSteps bigger or equal 3
-        useRemainingSteps()
-
-        return outputList
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 
-    private fun makeDivisibleByThree(number: Int): Int {
-        val outputNumber: Int = number
-        var tempList = splitNumberIntoDigits(number)
-        if(outputNumber % 3 == 2) {
-            tempList[0] += 1
-            numberOfSteps -= 1
-        } else {
-            tempList[0] += 2
-            numberOfSteps -= 2
-        }
-        return mergeDigitsIntoNumber(tempList)
+    /*
+        ********** My functions *****************
+     */
+
+    // Show result
+    private fun showResult() {
+        binding.resultTextView.text =
+            "Results: \nvalue1 = ${outputList[0]}, \nvelue2 = ${outputList[1]}, \nvalue3 = ${outputList[2]}"
+    }
+
+    // Fetches numbers from editexts
+    private fun getInputList(): MutableList<Int> {
+        return mutableListOf(
+            binding.firstValueEditText.text.toString().toInt(),
+            binding.secondValueEditText.text.toString().toInt(),
+            binding.thirdValueEditText.text.toString().toInt(),
+        )
 
     }
 
-    private fun useRemainingSteps() {
+    /* Example:
+    When all three numbers of input list are divisible by three, number of used steps is zero,
+    so we can use remaining six steps to to make result even bigger.
+    We can do it by adding 3 to highest digit to the biggest number of list (the most valuable digit),
+    to keep number divisible by three.
+    */
+    private fun useRemainingSteps(list: MutableList<Int>): MutableList<Int> {
+        val outputList = list
         while (numberOfSteps >= 3 ){
             var tempDigitList = splitNumberIntoDigits(outputList.max())
             tempDigitList[0] += 3
@@ -97,8 +88,44 @@ class MainFragment : Fragment() {
             outputList[outputList.indexOf(outputList.max())] = tempNumber
             numberOfSteps -= 3
         }
+        return outputList
     }
 
+    // Returns result
+    private fun getResult(list: MutableList<Int>): MutableList<Int> {
+        var outputList = getListDivisibleByThree(list)
+        outputList = useRemainingSteps(outputList)
+        return outputList
+    }
+
+    // Returns list of values divisible by three
+    private fun getListDivisibleByThree(list: MutableList<Int>): MutableList<Int> {
+        val outputList = mutableListOf<Int>()
+        list.forEach { item ->
+            if (!isDivisibleByThree(item)) {
+                outputList.add(makeNumberDivisibleByThree(item))
+            } else {
+                outputList.add(item)
+            }
+        }
+        return outputList
+    }
+
+    // Changes indivisible by three number into number divisible by three
+    private fun makeNumberDivisibleByThree(number: Int): Int {
+        val inputNumber: Int = number
+        var tempList = splitNumberIntoDigits(number)
+        if(inputNumber % 3 == 2) {
+            tempList[0] += 1
+            numberOfSteps -= 1
+        } else {
+            tempList[0] += 2
+            numberOfSteps -= 2
+        }
+        return mergeDigitsIntoNumber(tempList)
+    }
+
+    // Merges all digits in list into number
     private fun mergeDigitsIntoNumber(list: MutableList<Int>): Int {
         list.reverse()
         var x = 1
@@ -121,7 +148,7 @@ class MainFragment : Fragment() {
         return sumOfDigits % 3 == 0
     }
 
-    // Returns list with each digit of value in reversed order
+    // Returns list with each digit of input number in reversed order
     private fun splitNumberIntoDigits(number: Int): MutableList<Int> {
         var tempValue = number
         val outputDigitList = mutableListOf<Int>()
@@ -133,10 +160,4 @@ class MainFragment : Fragment() {
         outputDigitList.reverse()
         return outputDigitList
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-    }
-
 }
