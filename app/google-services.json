@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "584475798682",
+    "project_id": "lunarlogicapp",
+    "storage_bucket": "lunarlogicapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:584475798682:android:ceab81eab946a20714c323",
+        "android_client_info": {
+          "package_name": "com.adrpien.lunarlogictask"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "584475798682-n6hijv999397kjbickcv9sv5gfv385ic.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC70ZN6oN5gTsGCHBcn_0erkhwYerVUldw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "584475798682-n6hijv999397kjbickcv9sv5gfv385ic.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

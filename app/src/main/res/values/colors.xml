@@ -7,4 +7,6 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="signature_view_background_color">#929292</color>
+    <color name="signature_view_color">#002542</color>
 </resources>

@@ -1,18 +1,34 @@
 package com.adrpien.lunarlogictask.fragments
 
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.text.isDigitsOnly
+import androidx.fragment.app.FragmentResultListener
+import com.adrpien.lunarlogictask.R
+import com.adrpien.lunarlogictask.alertdialog.NumberPickerDialog
 import com.adrpien.lunarlogictask.databinding.FragmentMainBinding
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 
 class MainFragment : Fragment() {
+
+    private lateinit var tempNumberByteArray: ByteArray
 
     private var _binding: FragmentMainBinding? = null
     private val binding
         get() = _binding!!
+
+    // Input values
+    private var value1: Int = 0
+    private var value2: Int = 0
+    private var value3: Int = 0
+
 
     private lateinit var inputList: MutableList<Int>
     private lateinit var outputList: MutableList<Int>
@@ -33,6 +49,55 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // ValuesButton onclick implementation
+        binding.value1Button.setOnClickListener {
+            // Open SignatureDialog when signatureImageButtonClicked
+            val dialog = NumberPickerDialog()
+
+            // Dialog fragment result listener
+            // Saves ByteArray stored in bundle and converts to Bitmap; sets this bitmap as numberImageButton image
+            requireActivity().supportFragmentManager.setFragmentResultListener(
+                getString(R.string.number_request_key),
+                viewLifecycleOwner,
+                FragmentResultListener { requestKey, result ->
+                    tempNumberByteArray = result.getByteArray("number")!!
+                    val options = BitmapFactory.Options()
+                    options.inMutable = true
+                    val bmp = BitmapFactory.decodeByteArray(
+                        tempNumberByteArray,
+                        0,
+                        tempNumberByteArray.size,
+                        options
+                    )
+
+                    val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+                    val image = InputImage.fromBitmap(bmp, 0)
+                    val result = recognizer.process(image)
+                        .addOnSuccessListener { visionText ->
+                            val outputString = visionText.text
+                            val result = outputString.filter { it.isDigit() }
+                            value1 = result.toInt()
+                            // value1 = visionText.text.toInt
+                            binding.value1Button.text = value1.toString()
+                            binding.firstValueEditText.setText(value1.toString())
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(context, "UPS! Something wrong happend!", Toast.LENGTH_SHORT).show()
+                        }
+
+                })
+            // show MyTimePicker
+            dialog.show(childFragmentManager, getString(R.string.number_dialog_tag))
+        }
+
+        binding.value2Button.setOnClickListener {
+            // TODO value2Button onClick listener
+        }
+
+        binding.value3Button.setOnClickListener {
+            // TODO value3Button onClick listener
+        }
 
         // actionButton onClick implementation
         binding.actionButton.setOnClickListener {
@@ -76,8 +141,6 @@ class MainFragment : Fragment() {
     /* Example:
     When all three numbers of input list are divisible by three, number of used steps is zero,
     so we can use remaining six steps to to make result even bigger.
-    We can do it by adding 3 to highest digit to the biggest number of list (the most valuable digit),
-    to keep number divisible by three.
     */
     private fun useRemainingSteps(list: MutableList<Int>): MutableList<Int> {
 
@@ -90,7 +153,9 @@ class MainFragment : Fragment() {
         var tempOutputList = list.toMutableList()
         var tempNumberOfSteps = numberOfSteps
 
+        // If all 3 numbers are divisible by 3
         if (tempNumberOfSteps == 6) {
+
             for ((index, item) in tempOutputList.withIndex()) {
                 val tempList = tempOutputList.toMutableList()
                 var tempDigitList = splitNumberIntoDigits(tempOutputList[index])
@@ -109,6 +174,8 @@ class MainFragment : Fragment() {
             tempNumberOfSteps -= 3
 
         }
+
+        // If number of left steps is equall 3 or more
         if (tempNumberOfSteps >= 3) {
             for ((index, item) in tempOutputList.withIndex()){
                 val tempList = tempOutputList.toMutableList()

@@ -8,35 +8,67 @@
     tools:context=".fragments.MainFragment"
     android:layout_margin="10dp"
     >
+
+    <LinearLayout
+        android:id="@+id/entryValuesButtonsLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/value1Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Button" />
+
+        <Button
+            android:id="@+id/value2Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Button" />
+
+        <Button
+            android:id="@+id/value3Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Button" />
+    </LinearLayout>
+
     <LinearLayout
         android:id="@+id/entryValuesLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/entryValuesButtonsLinearLayout">
         <EditText
             android:id="@+id/firstValueEditText"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"
-            android:hint="First value"
+            android:hint="@string/first_value"
             android:layout_margin="5dp"/>
+
         <EditText
             android:id="@+id/secondValueEditText"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:hint="@string/second_value"
             android:inputType="numberDecimal"
-            android:hint="Second value"
-            android:layout_margin="5dp"/>
+            android:minHeight="48dp" />
         <EditText
             android:id="@+id/thirdValueEditText"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"
-            android:hint="Third value"
+            android:hint="@string/third_value"
             android:layout_margin="5dp"/>
     </LinearLayout>
 
@@ -45,7 +77,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         app:layout_constraintTop_toBottomOf="@id/entryValuesLinearLayout"
-        android:text="Start"/>
+        android:text="@string/get_result"/>
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -2,4 +2,13 @@
     <string name="app_name">LunarLogicTask</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="first_value">first value</string>
+    <string name="second_value">second value</string>
+    <string name="third_value">third value</string>
+    <string name="get_result">Get result</string>
+    <string name="write_number">Write number</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="number_request_key">number_request_key</string>
+    <string name="number_dialog_tag">number_dialog_tag</string>
 </resources>
