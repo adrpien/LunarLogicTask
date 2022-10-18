@@ -77,8 +77,11 @@ class MainFragment : Fragment() {
                         .addOnSuccessListener { visionText ->
                             val outputString = visionText.text
                             val result = outputString.filter { it.isDigit() }
-                            value1 = result.toInt()
-                            // value1 = visionText.text.toInt
+                            if (result.isNotEmpty()){
+                                value1 = result.toInt()
+                            } else {
+                                value1 = 997
+                            }
                             binding.value1Button.text = value1.toString()
                             binding.firstValueEditText.setText(value1.toString())
                         }
