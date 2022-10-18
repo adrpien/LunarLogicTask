@@ -1,13 +1,16 @@
 package com.adrpien.lunarlogictask.fragments
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
-import androidx.core.text.isDigitsOnly
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.FragmentResultListener
 import com.adrpien.lunarlogictask.R
 import com.adrpien.lunarlogictask.alertdialog.NumberPickerDialog
@@ -50,61 +53,77 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // ValuesButton onclick implementation
+        // value1Button onclick implementation
         binding.value1Button.setOnClickListener {
             // Open SignatureDialog when signatureImageButtonClicked
             val dialog = NumberPickerDialog()
-
             // Dialog fragment result listener
             // Saves ByteArray stored in bundle and converts to Bitmap; sets this bitmap as numberImageButton image
             requireActivity().supportFragmentManager.setFragmentResultListener(
                 getString(R.string.number_request_key),
                 viewLifecycleOwner,
                 FragmentResultListener { requestKey, result ->
-                    tempNumberByteArray = result.getByteArray("number")!!
-                    val options = BitmapFactory.Options()
-                    options.inMutable = true
-                    val bmp = BitmapFactory.decodeByteArray(
-                        tempNumberByteArray,
-                        0,
-                        tempNumberByteArray.size,
-                        options
-                    )
-
-                    val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-                    val image = InputImage.fromBitmap(bmp, 0)
-                    val result = recognizer.process(image)
-                        .addOnSuccessListener { visionText ->
-                            val outputString = visionText.text
-                            val result = outputString.filter { it.isDigit() }
-                            if (result.isNotEmpty()){
-                                value1 = result.toInt()
-                            } else {
-                                value1 = 997
-                            }
-                            binding.value1Button.text = value1.toString()
-                            binding.firstValueEditText.setText(value1.toString())
-                        }
-                        .addOnFailureListener { e ->
-                            Toast.makeText(context, "UPS! Something wrong happend!", Toast.LENGTH_SHORT).show()
-                        }
-
+                    val bitmap = fetchBitmapFromBundle(result)
+                    recognizeHandwriting(bitmap, value1, binding.value1Button, binding.value1EditText)
                 })
             // show MyTimePicker
             dialog.show(childFragmentManager, getString(R.string.number_dialog_tag))
         }
 
+        // value1Button onclick implementation
         binding.value2Button.setOnClickListener {
-            // TODO value2Button onClick listener
+            // Open SignatureDialog when signatureImageButtonClicked
+            val dialog = NumberPickerDialog()
+            // Dialog fragment result listener
+            // Saves ByteArray stored in bundle and converts to Bitmap; sets this bitmap as numberImageButton image
+            requireActivity().supportFragmentManager.setFragmentResultListener(
+                getString(R.string.number_request_key),
+                viewLifecycleOwner,
+                FragmentResultListener { requestKey, result ->
+                    val bitmap = fetchBitmapFromBundle(result)
+                    recognizeHandwriting(bitmap, value2, binding.value2Button, binding.value2EditText)
+                })
+            // show MyTimePicker
+            dialog.show(childFragmentManager, getString(R.string.number_dialog_tag))        }
+
+        // value3Button onclick implementation
+        binding.value3Button.setOnClickListener {
+            // Open SignatureDialog when signatureImageButtonClicked
+            val dialog = NumberPickerDialog()
+            // Dialog fragment result listener
+            // Saves ByteArray stored in bundle and converts to Bitmap; sets this bitmap as numberImageButton image
+            requireActivity().supportFragmentManager.setFragmentResultListener(
+                getString(R.string.number_request_key),
+                viewLifecycleOwner,
+                FragmentResultListener { requestKey, result ->
+                    val bitmap = fetchBitmapFromBundle(result)
+                    recognizeHandwriting(bitmap, value3, binding.value3Button, binding.value3EditText)
+                })
+            // show MyTimePicker
+            dialog.show(childFragmentManager, getString(R.string.number_dialog_tag))
         }
 
-        binding.value3Button.setOnClickListener {
-            // TODO value3Button onClick listener
+        // Adjust button text when editText text changed
+        binding.value1EditText.doAfterTextChanged {
+            binding.value1Button.text = binding.value1EditText.text
+            value1 = binding.value1EditText.text.toString().toInt()
+        }
+
+        // Adjust button text when editText text changed
+        binding.value2EditText.doAfterTextChanged {
+            binding.value2Button.text = binding.value2EditText.text
+            value2 = binding.value2EditText.text.toString().toInt()
+        }
+
+        // Adjust button text when editText text changed
+        binding.value3EditText.doAfterTextChanged {
+            binding.value3Button.text = binding.value3EditText.text
+            value3 = binding.value3EditText.text.toString().toInt()
         }
 
         // actionButton onClick implementation
         binding.actionButton.setOnClickListener {
-            if(binding.firstValueEditText.text.toString() != "" && binding.secondValueEditText.text.toString() != "" && binding.thirdValueEditText.text.toString() != "") {
+            if(binding.value1EditText.text.toString() != "" && binding.value2EditText.text.toString() != "" && binding.value3EditText.text.toString() != "") {
                 numberOfSteps = 6
                 inputList = getInputList()
                 outputList = getResult(inputList)
@@ -116,6 +135,7 @@ class MainFragment : Fragment() {
 
     }
 
+
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
@@ -124,6 +144,42 @@ class MainFragment : Fragment() {
     /*
         ************** My functions *****************
      */
+
+    // Fetches bitmap using bundle from alert dialog
+    private fun fetchBitmapFromBundle(bundle: Bundle): Bitmap {
+        tempNumberByteArray = bundle.getByteArray("number")!!
+        val options = BitmapFactory.Options()
+        options.inMutable = true
+        val bmp = BitmapFactory.decodeByteArray(
+            tempNumberByteArray,
+            0,
+            tempNumberByteArray.size,
+            options
+        )
+        return bmp
+    }
+
+    // Recognizes handwriting using delivered bitmap
+    private fun recognizeHandwriting(bitmap: Bitmap, variableToFill: Int, buttonToFill: Button, editTextToFill: EditText): Int {
+        var outputValue = 999
+        val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+        val image = InputImage.fromBitmap(bitmap, 0)
+        val result = recognizer.process(image)
+            .addOnSuccessListener { visionText ->
+                val outputString = visionText.text
+                val result = outputString.filter { it.isDigit() }
+                outputValue = if (result.isNotEmpty()) { result.toInt() } else { 997 }
+                buttonToFill.text = outputValue.toString()
+                editTextToFill.setText(outputValue.toString())
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(context, "UPS! Something wrong happend!", Toast.LENGTH_SHORT).show()
+                outputValue = 998
+                buttonToFill.text = outputValue.toString()
+                editTextToFill.setText(outputValue.toString())
+            }
+        return outputValue
+    }
 
     // Show result
     private fun showResult() {
@@ -134,9 +190,9 @@ class MainFragment : Fragment() {
     // Fetches numbers from editexts
     private fun getInputList(): MutableList<Int> {
         return mutableListOf(
-            binding.firstValueEditText.text.toString().toInt(),
-            binding.secondValueEditText.text.toString().toInt(),
-            binding.thirdValueEditText.text.toString().toInt(),
+            value1,
+            value2,
+            value3
         )
 
     }

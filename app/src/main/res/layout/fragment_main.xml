@@ -45,7 +45,7 @@
         android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@id/entryValuesButtonsLinearLayout">
         <EditText
-            android:id="@+id/firstValueEditText"
+            android:id="@+id/value1EditText"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
             android:layout_margin="5dp"/>
 
         <EditText
-            android:id="@+id/secondValueEditText"
+            android:id="@+id/value2EditText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
@@ -63,7 +63,7 @@
             android:inputType="numberDecimal"
             android:minHeight="48dp" />
         <EditText
-            android:id="@+id/thirdValueEditText"
+            android:id="@+id/value3EditText"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
