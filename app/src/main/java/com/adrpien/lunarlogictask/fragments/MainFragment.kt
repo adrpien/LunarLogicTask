@@ -105,20 +105,39 @@ class MainFragment : Fragment() {
 
         // Adjust button text when editText text changed
         binding.value1EditText.doAfterTextChanged {
-            binding.value1Button.text = binding.value1EditText.text
-            value1 = binding.value1EditText.text.toString().toInt()
+            if (!binding.value1EditText.text.isEmpty()) {
+                binding.value1Button.text = binding.value1EditText.text
+                value1 = binding.value1EditText.text.toString().toInt()
+            }  else {
+            binding.value1Button.text =  "0"
+            binding.value1EditText.setText("0")
+            value1 = 0
+        }
+
         }
 
         // Adjust button text when editText text changed
         binding.value2EditText.doAfterTextChanged {
-            binding.value2Button.text = binding.value2EditText.text
-            value2 = binding.value2EditText.text.toString().toInt()
+            if (!binding.value2EditText.text.isEmpty()) {
+                binding.value2Button.text = binding.value2EditText.text
+                value2 = binding.value2EditText.text.toString().toInt()
+            } else {
+                binding.value2Button.text =  "0"
+                binding.value2EditText.setText("0")
+                value2 = 0
+            }
         }
 
         // Adjust button text when editText text changed
         binding.value3EditText.doAfterTextChanged {
-            binding.value3Button.text = binding.value3EditText.text
-            value3 = binding.value3EditText.text.toString().toInt()
+            if (!binding.value3EditText.text.isEmpty()) {
+                binding.value3Button.text = binding.value3EditText.text
+                value3 = binding.value3EditText.text.toString().toInt()
+            } else {
+                binding.value3Button.text =  "0"
+                binding.value3EditText.setText("0")
+                value3 = 0
+            }
         }
 
         // actionButton onClick implementation
