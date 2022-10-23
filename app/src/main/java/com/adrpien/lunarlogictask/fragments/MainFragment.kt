@@ -38,6 +38,13 @@ class MainFragment : Fragment() {
     private var numberOfSteps = 6
 
     /*
+        ************* ERROR CODES ******************
+        999 Handwriting recognition fun returns empty value
+        998 Handwriting recognition fun failure
+        997 Handwriting recognition  fun returned default value
+     */
+
+    /*
        ************** Lifecycle functions **************
      */
 
@@ -64,13 +71,13 @@ class MainFragment : Fragment() {
                 viewLifecycleOwner,
                 FragmentResultListener { requestKey, result ->
                     val bitmap = fetchBitmapFromBundle(result)
-                    recognizeHandwriting(bitmap, value1, binding.value1Button, binding.value1EditText)
+                    recognizeHandwriting(bitmap, binding.value1Button, binding.value1EditText)
                 })
             // show MyTimePicker
             dialog.show(childFragmentManager, getString(R.string.number_dialog_tag))
         }
 
-        // value1Button onclick implementation
+        // value2Button onclick implementation
         binding.value2Button.setOnClickListener {
             // Open SignatureDialog when signatureImageButtonClicked
             val dialog = NumberPickerDialog()
@@ -81,7 +88,7 @@ class MainFragment : Fragment() {
                 viewLifecycleOwner,
                 FragmentResultListener { requestKey, result ->
                     val bitmap = fetchBitmapFromBundle(result)
-                    recognizeHandwriting(bitmap, value2, binding.value2Button, binding.value2EditText)
+                    recognizeHandwriting(bitmap, binding.value2Button, binding.value2EditText)
                 })
             // show MyTimePicker
             dialog.show(childFragmentManager, getString(R.string.number_dialog_tag))        }
@@ -97,7 +104,7 @@ class MainFragment : Fragment() {
                 viewLifecycleOwner,
                 FragmentResultListener { requestKey, result ->
                     val bitmap = fetchBitmapFromBundle(result)
-                    recognizeHandwriting(bitmap, value3, binding.value3Button, binding.value3EditText)
+                    recognizeHandwriting(bitmap, binding.value3Button, binding.value3EditText)
                 })
             // show MyTimePicker
             dialog.show(childFragmentManager, getString(R.string.number_dialog_tag))
@@ -106,37 +113,49 @@ class MainFragment : Fragment() {
         // Adjust button text when editText text changed
         binding.value1EditText.doAfterTextChanged {
             if (!binding.value1EditText.text.isEmpty()) {
-                binding.value1Button.text = binding.value1EditText.text
-                value1 = binding.value1EditText.text.toString().toInt()
-            }  else {
-            binding.value1Button.text =  "0"
-            binding.value1EditText.setText("0")
-            value1 = 0
-        }
-
+                // Extracting numeric marks from String and converting into Int
+                val regex = Regex("[^A-Za-z0-9 ]")
+                value1 = binding.value1EditText.text.toString()
+                    //.filter { it.isDigit() } // can be this way too
+                    .replace(regex, "")
+                    .toInt()
+                binding.value1Button.setText(value1.toString())
+            } else {
+                // value1 = 0 when field empty
+                value1 = 0
+                binding.value1Button.setText(value1.toString())
+            }
         }
 
         // Adjust button text when editText text changed
         binding.value2EditText.doAfterTextChanged {
             if (!binding.value2EditText.text.isEmpty()) {
-                binding.value2Button.text = binding.value2EditText.text
-                value2 = binding.value2EditText.text.toString().toInt()
+                // Extracting numeric marks from String and conerting into Int
+                val regex = Regex("[^A-Za-z0-9 ]")
+                value2 = binding.value2EditText.text.toString()
+                    .replace(regex, "")
+                    .toInt()
+                binding.value2Button.setText(value2.toString())
             } else {
-                binding.value2Button.text =  "0"
-                binding.value2EditText.setText("0")
+                // value2 = 0 when field empty
                 value2 = 0
+                binding.value2Button.setText(value2.toString())
             }
         }
 
         // Adjust button text when editText text changed
         binding.value3EditText.doAfterTextChanged {
             if (!binding.value3EditText.text.isEmpty()) {
-                binding.value3Button.text = binding.value3EditText.text
-                value3 = binding.value3EditText.text.toString().toInt()
+                // Extracting numeric marks from String and conerting into Int
+                val regex = Regex("[^A-Za-z0-9 ]")
+                value3 = binding.value3EditText.text.toString()
+                    .replace(regex, "")
+                    .toInt()
+                binding.value3Button.setText(value3.toString())
             } else {
-                binding.value3Button.text =  "0"
-                binding.value3EditText.setText("0")
+                // value3 = 0 when field empty
                 value3 = 0
+                binding.value3Button.setText(value3.toString())
             }
         }
 
@@ -178,8 +197,27 @@ class MainFragment : Fragment() {
         return bmp
     }
 
+    // DOES NOT WORK PROPERLY
     // Recognizes handwriting using delivered bitmap
-    private fun recognizeHandwriting(bitmap: Bitmap, variableToFill: Int, buttonToFill: Button, editTextToFill: EditText): Int {
+    private fun recognizeHandwriting(bitmap: Bitmap): Int {
+        var outputValue = 997
+        val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+        val image = InputImage.fromBitmap(bitmap, 0)
+        val result = recognizer.process(image)
+            .addOnSuccessListener { visionText ->
+                val outputString = visionText.text
+                val result = outputString.filter { it.isDigit() }
+                outputValue = if (result.isNotEmpty()) { result.toInt() } else { 999 }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(context, "UPS! Something wrong happend!", Toast.LENGTH_SHORT).show()
+                outputValue = 998
+            }
+        return outputValue
+    }
+
+    // Recognizes handwriting using delivered bitmap
+    private fun recognizeHandwriting(bitmap: Bitmap, buttonToFill: Button, editTextToFill: EditText): Int{
         var outputValue = 999
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
         val image = InputImage.fromBitmap(bitmap, 0)
@@ -188,13 +226,13 @@ class MainFragment : Fragment() {
                 val outputString = visionText.text
                 val result = outputString.filter { it.isDigit() }
                 outputValue = if (result.isNotEmpty()) { result.toInt() } else { 997 }
-                buttonToFill.text = outputValue.toString()
+                // buttonToFill.text = outputValue.toString() // not required
                 editTextToFill.setText(outputValue.toString())
             }
             .addOnFailureListener { e ->
                 Toast.makeText(context, "UPS! Something wrong happend!", Toast.LENGTH_SHORT).show()
                 outputValue = 998
-                buttonToFill.text = outputValue.toString()
+                // buttonToFill.text = outputValue.toString() // not required
                 editTextToFill.setText(outputValue.toString())
             }
         return outputValue
