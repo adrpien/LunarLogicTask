@@ -8,6 +8,6 @@
     <com.adrpien.lunarlogictask.alertdialog.NumberView
         android:id="@+id/numberView"
         android:layout_width="match_parent"
-        android:layout_height="100dp" />
+        android:layout_height="150dp" />
 
 </LinearLayout>
