@@ -48,8 +48,26 @@ class MainFragment : Fragment() {
        ************** Lifecycle functions **************
      */
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        // Save values when rotated
+        outState.putInt("value1", value1)
+        outState.putInt("value2", value2)
+        outState.putInt("value3", value2)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //
+        if (savedInstanceState != null) {
+
+            // Set values if saved in bundle
+            value1 = savedInstanceState.getInt("value1")
+            value2 = savedInstanceState.getInt("value2")
+            value3 = savedInstanceState.getInt("value3")
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -240,8 +258,9 @@ class MainFragment : Fragment() {
 
     // Show result
     private fun showResult() {
-        binding.resultTextView.text =
-            "Results: \nvalue1 = ${outputList[0]}, \nvelue2 = ${outputList[1]}, \nvalue3 = ${outputList[2]}"
+        binding.resultValue1TextView.text = "${outputList[0]}"
+        binding.resultValue2TextView.text = "${outputList[1]}"
+        binding.resultValue3TextView.text = "${outputList[2]}"
     }
 
     // Fetches numbers from editexts

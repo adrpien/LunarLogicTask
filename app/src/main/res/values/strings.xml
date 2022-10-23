@@ -11,4 +11,7 @@
     <string name="cancel">Cancel</string>
     <string name="number_request_key">number_request_key</string>
     <string name="number_dialog_tag">number_dialog_tag</string>
+    <string name="instruction_text1">Simply define input values handwriting your numbers</string>
+    <string name="instruction_text2">Or define them below</string>
+    <string name="your_results">Your results:</string>
 </resources>
